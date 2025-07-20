@@ -1,13 +1,21 @@
+// src/pages/Dashboard.jsx
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "./DashboardPage.css"
+
+import DashboardSection from "../components/DashboardOverview"
+import FindScholarshipsSection from "../components/FindScholarships"
+import MyApplicationsSection from "../components/MyApplications"
+import CalendarSection from "../components/CalendarPage"
+import ProfileSection from "../components/ProfilePage"
+import SettingsSection from "../components/SettingsPage"
 
 const DashboardPage = () => {
   const [user, setUser] = useState(null)
   const [bookmarkedScholarships, setBookmarkedScholarships] = useState([])
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("bookmarks")
+  const [activeTab, setActiveTab] = useState("dashboard")
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -67,48 +75,35 @@ const DashboardPage = () => {
       <h2>Welcome, {user?.username || "User"}</h2>
 
       <div className="dashboard-tabs">
-        <button
-          className={activeTab === "bookmarks" ? "active" : ""}
-          onClick={() => setActiveTab("bookmarks")}
-        >
-          Bookmarked Scholarships
-        </button>
-        <button
-          className={activeTab === "recommendations" ? "active" : ""}
-          onClick={() => setActiveTab("recommendations")}
-        >
-          Recommendations
-        </button>
+        {["dashboard", "find", "applications", "calendar", "profile", "settings"].map((tab) => (
+          <button
+            key={tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab === "dashboard"
+              ? "Dashboard"
+              : tab === "find"
+              ? "Find Scholarships"
+              : tab === "applications"
+              ? "My Applications"
+              : tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
 
       <div className="dashboard-content">
-        {activeTab === "bookmarks" && (
-          <ul>
-            {bookmarkedScholarships.length > 0 ? (
-              bookmarkedScholarships.map((scholarship) => (
-                <li key={scholarship.id}>
-                  <strong>{scholarship.title}</strong> — {scholarship.amount}
-                </li>
-              ))
-            ) : (
-              <p>No bookmarks yet.</p>
-            )}
-          </ul>
+        {activeTab === "dashboard" && (
+          <DashboardSection
+            bookmarkedScholarships={bookmarkedScholarships}
+            recommendations={recommendations}
+          />
         )}
-
-        {activeTab === "recommendations" && (
-          <ul>
-            {recommendations.length > 0 ? (
-              recommendations.map((rec) => (
-                <li key={rec.id}>
-                  <strong>{rec.title}</strong> — {rec.amount}
-                </li>
-              ))
-            ) : (
-              <p>No recommendations yet.</p>
-            )}
-          </ul>
-        )}
+        {activeTab === "find" && <FindScholarshipsSection />}
+        {activeTab === "applications" && <MyApplicationsSection />}
+        {activeTab === "calendar" && <CalendarSection />}
+        {activeTab === "profile" && <ProfileSection user={user} />}
+        {activeTab === "settings" && <SettingsSection />}
       </div>
     </div>
   )
