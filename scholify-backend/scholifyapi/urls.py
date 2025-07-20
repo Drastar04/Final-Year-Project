@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/auth/user/', get_authenticated_user),  # GET
     path('api/dashboard/bookmarks/', get_user_bookmarks),  # GET
     path('api/dashboard/recommendations/', get_user_recommendations),  # GET
+    path('api/', include('scholarships.urls')),
 ]

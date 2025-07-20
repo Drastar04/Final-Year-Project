@@ -27,3 +27,11 @@ class Bookmark(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="settings")
+    data = models.JSONField(default=dict)  # Store all settings JSON here
+
+    def __str__(self):
+        return f"Settings for {self.user.username}"

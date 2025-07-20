@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ScholarshipListCreateAPIView, ScholarshipRetrieveUpdateDestroyAPIView
+from .views import ScholarshipListCreateAPIView, ScholarshipRetrieveUpdateDestroyAPIView, UserSettingsView
 from . import auth_views
 from . import views
 from . import dashboard_views  # 👈 import the dashboard view file 
@@ -21,5 +21,7 @@ urlpatterns = [
    # scholifyapi/urls.py or scholarships/urls.py
     path('api/dashboard/bookmarks/', get_user_bookmarks),
     path('api/dashboard/recommendations/', get_user_recommendations),
+    
+    path('settings/', UserSettingsView.as_view(), name='user-settings'),
 
 ]

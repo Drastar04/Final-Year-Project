@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Scholarship, Bookmark
 
+
 class ScholarshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scholarship
@@ -12,3 +13,10 @@ class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bookmark
         fields = ['id', 'scholarship', 'created_at']
+        
+
+class UserSettingsSerializer(serializers.Serializer):
+    notifications = serializers.DictField(child=serializers.BooleanField())
+    privacy = serializers.DictField()
+    preferences = serializers.DictField()
+    account = serializers.DictField()

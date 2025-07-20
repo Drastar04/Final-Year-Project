@@ -1,21 +1,22 @@
-// src/pages/Dashboard.jsx
+"use client"
+
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import "./DashboardPage.css"
+import DashboardOverview from "../components/DashboardOverview.jsx"
+import FindScholarships from "../components/FindScholarships.jsx"
+import MyApplications from "../components/MyApplications.jsx"
+import CalendarPage from "../components/CalendarPage.jsx"
+import ProfilePage from "../components/ProfilePage.jsx"
+import SettingsPage from "../components/SettingsPage.jsx"
+import "./DashboardPage.css"  // Use your preferred CSS filename
 
-import DashboardSection from "../components/DashboardOverview"
-import FindScholarshipsSection from "../components/FindScholarships"
-import MyApplicationsSection from "../components/MyApplications"
-import CalendarSection from "../components/CalendarPage"
-import ProfileSection from "../components/ProfilePage"
-import SettingsSection from "../components/SettingsPage"
-
-const DashboardPage = () => {
+const Dashboard = () => {
   const [user, setUser] = useState(null)
   const [bookmarkedScholarships, setBookmarkedScholarships] = useState([])
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("dashboard")
+  const [activeTab, setActiveTab] = useState("overview")
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -62,6 +63,57 @@ const DashboardPage = () => {
     fetchDashboardData()
   }, [navigate])
 
+  const navigationItems = [
+    {
+      id: "overview",
+      label: "Dashboard Overview",
+      icon: "📊",
+      component: () => (
+        <DashboardOverview
+          bookmarkedScholarships={bookmarkedScholarships}
+          recommendations={recommendations}
+        />
+      ),
+    },
+    {
+      id: "scholarships",
+      label: "Find Scholarships",
+      icon: "🔍",
+      component: FindScholarships,
+    },
+    {
+      id: "applications",
+      label: "My Applications",
+      icon: "📝",
+      component: MyApplications,
+    },
+    {
+      id: "calendar",
+      label: "Calendar",
+      icon: "📅",
+      component: CalendarPage,
+    },
+    {
+      id: "profile",
+      label: "Profile",
+      icon: "👤",
+      component: () => <ProfilePage user={user} />,
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: "⚙️",
+      component: SettingsPage,
+    },
+  ]
+
+  const ActiveComponent =
+    navigationItems.find((item) => item.id === activeTab)?.component || (() => <DashboardOverview />)
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -71,42 +123,57 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="dashboard-page">
-      <h2>Welcome, {user?.username || "User"}</h2>
-
-      <div className="dashboard-tabs">
-        {["dashboard", "find", "applications", "calendar", "profile", "settings"].map((tab) => (
-          <button
-            key={tab}
-            className={activeTab === tab ? "active" : ""}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab === "dashboard"
-              ? "Dashboard"
-              : tab === "find"
-              ? "Find Scholarships"
-              : tab === "applications"
-              ? "My Applications"
-              : tab.charAt(0).toUpperCase() + tab.slice(1)}
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
+        <div className="sidebar-header">
+          <div className="logo">
+            <h2>🎓 Scholify</h2>
+          </div>
+          <button className="sidebar-toggle" onClick={toggleSidebar}>
+            {sidebarOpen ? "←" : "→"}
           </button>
-        ))}
-      </div>
+        </div>
 
-      <div className="dashboard-content">
-        {activeTab === "dashboard" && (
-          <DashboardSection
-            bookmarkedScholarships={bookmarkedScholarships}
-            recommendations={recommendations}
-          />
-        )}
-        {activeTab === "find" && <FindScholarshipsSection />}
-        {activeTab === "applications" && <MyApplicationsSection />}
-        {activeTab === "calendar" && <CalendarSection />}
-        {activeTab === "profile" && <ProfileSection user={user} />}
-        {activeTab === "settings" && <SettingsSection />}
-      </div>
+        <nav className="sidebar-nav">
+          {navigationItems.map((item) => (
+            <button
+              key={item.id}
+              className={`nav-item ${activeTab === item.id ? "nav-item-active" : ""}`}
+              onClick={() => setActiveTab(item.id)}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              {sidebarOpen && <span className="nav-label">{item.label}</span>}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className={`main-content ${sidebarOpen ? "main-content-expanded" : "main-content-full"}`}>
+        <header className="main-header">
+          <div className="header-left">
+            <button className="mobile-menu-btn" onClick={toggleSidebar}>
+              ☰
+            </button>
+            <h1 className="page-title">
+              {navigationItems.find((item) => item.id === activeTab)?.label || "Dashboard"}
+            </h1>
+          </div>
+          <div className="header-right">
+            <div className="user-info">
+              <span className="user-avatar">👤</span>
+              <span className="user-name">{user?.username || "Student"}</span>
+            </div>
+          </div>
+        </header>
+
+        <div className="content-area">
+          <ActiveComponent />
+        </div>
+      </main>
     </div>
   )
 }
 
-export default DashboardPage
+export default Dashboard
